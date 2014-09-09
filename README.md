@@ -3,7 +3,9 @@ MaterialButton
 
 Material design button in Jelly Bean and Kita.
 
-[Imgur](http://i.imgur.com/BGsgyqN.png)
+## Screenshot ##
+
+![Imgur](http://github.com/unicorn.png "Imgur")
 
 ## Usage ##
 
