@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="corner_radius">2dp</dimen>
+    <dimen name="padding_left">2dp</dimen>
+    <dimen name="padding_right">2dp</dimen>
+    <dimen name="padding_top">2dp</dimen>
+    <dimen name="padding_bottom">4dp</dimen>
+</resources>

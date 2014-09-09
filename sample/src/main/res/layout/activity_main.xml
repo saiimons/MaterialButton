@@ -1,0 +1,9 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#fff0f0f0"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.keith.mb.MaterialButton
+        android:layout_centerInParent="true"
+        android:layout_width="150dp"
+        android:layout_height="50dp"/>
+</RelativeLayout>
