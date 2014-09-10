@@ -5,7 +5,7 @@ Material design button in Jelly Bean and Kita.
 
 ## Screenshot ##
 
-![Imgur](http://i.imgur.com/XBuruy8.png)
+![Imgur](http://i.imgur.com/vLhEjwG.gif)
 
 ## Usage ##
 
