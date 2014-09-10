@@ -22,7 +22,7 @@ public class MaterialButton extends View {
 
     private static final String TAG = MaterialButton.class.getSimpleName();
 
-    private static final int AnimationDuration = 300;
+    private static final long AnimationDuration = 200;
 
     private String mText;
 
@@ -59,6 +59,8 @@ public class MaterialButton extends View {
     private Path clipPath;
 
     private boolean isPressed = false;
+
+    private long startTime;
 
     public MaterialButton(Context context) {
         this(context, null);
@@ -149,6 +151,7 @@ public class MaterialButton extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 isPressed = true;
+                startTime = System.currentTimeMillis();
                 mButtonPaint.setShadowLayer(10, 0, mPaddingTop + 4, mColorShadow);
                 invalidate();
                 break;
@@ -181,7 +184,15 @@ public class MaterialButton extends View {
                 clipPath.addRoundRect(buttonRectF, mRadius, mRadius, Path.Direction.CW);
             }
             canvas.clipPath(clipPath);
-            canvas.drawCircle(touchPoint.x, touchPoint.y, getWidth() / 2, mCirclePaint);
+            long elapsed = System.currentTimeMillis() - startTime;
+            int radius;
+            if (elapsed < AnimationDuration) {
+                radius = Math.round(elapsed * getWidth() / 2 / AnimationDuration);
+                postInvalidate();
+            } else {
+                radius = getWidth() / 2;
+            }
+            canvas.drawCircle(touchPoint.x, touchPoint.y, radius, mCirclePaint);
         }
         // Draw button text
         canvas.restore();
