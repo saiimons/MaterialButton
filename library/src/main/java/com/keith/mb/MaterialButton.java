@@ -24,6 +24,12 @@ public class MaterialButton extends View {
 
     private static final long AnimationDuration = 200;
 
+    private static final int StateNormal = 1;
+
+    private static final int StateTouchDown = 2;
+
+    private static final int StateTouchUp = 3;
+
     private String mText;
 
     private int mTextColor;
@@ -46,21 +52,23 @@ public class MaterialButton extends View {
 
     private int mPaddingBottom;
 
+    private long startTime;
+
     private Point touchPoint;
+
+    private RectF buttonRectF;
+
+    private Path clipPath;
+
+    private int state = StateNormal;
+
+    private int rippleRadius;
 
     private Paint mButtonPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private Paint mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private TextPaint mTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-
-    private RectF buttonRectF;
-
-    private Path clipPath;
-
-    private boolean isPressed = false;
-
-    private long startTime;
 
     public MaterialButton(Context context) {
         this(context, null);
@@ -95,9 +103,7 @@ public class MaterialButton extends View {
         mButtonPaint.setColor(mColorNormal);
         mButtonPaint.setShadowLayer(5, 0, Math.round(mPaddingTop * 0.8), mColorShadow);
         setLayerType(LAYER_TYPE_SOFTWARE, mButtonPaint);
-
         mCirclePaint.setColor(mColorRipple);
-
         mTextPaint.setColor(mTextColor);
         mTextPaint.setTextSize(mTextSize);
         mTextPaint.setTextAlign(TextPaint.Align.CENTER);
@@ -150,13 +156,14 @@ public class MaterialButton extends View {
         touchPoint.set(Math.round(event.getX()), Math.round(event.getY()));
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                isPressed = true;
+                state = StateTouchDown;
                 startTime = System.currentTimeMillis();
                 mButtonPaint.setShadowLayer(10, 0, mPaddingTop + 4, mColorShadow);
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                isPressed = false;
+                state = StateTouchUp;
+                startTime = System.currentTimeMillis();
                 mButtonPaint.setShadowLayer(5, 0, Math.round(mPaddingTop * 0.8), mColorShadow);
                 invalidate();
                 break;
@@ -178,22 +185,46 @@ public class MaterialButton extends View {
         canvas.drawRoundRect(buttonRectF, mRadius, mRadius, mButtonPaint);
         canvas.save();
         // Draw button ripple
-        if (isPressed) {
+        if (state == StateTouchDown || state == StateTouchUp) {
             if (clipPath == null) {
                 clipPath = new Path();
                 clipPath.addRoundRect(buttonRectF, mRadius, mRadius, Path.Direction.CW);
             }
             canvas.clipPath(clipPath);
-            long elapsed = System.currentTimeMillis() - startTime;
-            int radius;
-            if (elapsed < AnimationDuration) {
-                radius = Math.round(elapsed * getWidth() / 2 / AnimationDuration);
-                postInvalidate();
-            } else {
-                radius = getWidth() / 2;
-            }
-            canvas.drawCircle(touchPoint.x, touchPoint.y, radius, mCirclePaint);
         }
+        int radius = 0;
+        long elapsed = System.currentTimeMillis() - startTime;
+        switch (state) {
+            case StateTouchDown: {
+                mCirclePaint.setAlpha(255);
+                if (elapsed < AnimationDuration) {
+                    radius = Math.round(elapsed * getWidth() / 2 / AnimationDuration);
+                    postInvalidate();
+                } else {
+                    radius = getWidth() / 2;
+                }
+                rippleRadius = radius;
+            }
+            break;
+            case StateTouchUp: {
+                if (elapsed < AnimationDuration) {
+                    int alpha = Math.round((AnimationDuration - elapsed) * 255 / AnimationDuration);
+                    mCirclePaint.setAlpha(alpha);
+                    radius = rippleRadius + Math.round(elapsed * getWidth() / 2 / AnimationDuration);
+                    postInvalidate();
+                } else {
+                    mCirclePaint.setAlpha(0);
+                    radius = 0;
+                    state = StateNormal;
+                    postInvalidate();
+                }
+            }
+            break;
+            case StateNormal:
+                radius = 0;
+                break;
+        }
+        canvas.drawCircle(touchPoint.x, touchPoint.y, radius, mCirclePaint);
         // Draw button text
         canvas.restore();
         drawText(canvas);
