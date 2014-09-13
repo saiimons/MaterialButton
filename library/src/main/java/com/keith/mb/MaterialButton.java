@@ -2,12 +2,15 @@ package com.keith.mb;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -25,48 +28,32 @@ public class MaterialButton extends View {
     private static final long AnimationDuration = 200;
 
     private static final int StateNormal = 1;
-
-    private static final int StateTouchDown = 2;
-
-    private static final int StateTouchUp = 3;
-
-    private String mText;
-
-    private int mTextColor;
-
-    private int mTextSize;
-
-    private int mRadius;
-
-    private int mColorNormal;
-
-    private int mColorShadow;
-
-    private int mColorRipple;
-
-    private int mPaddingLeft;
-
-    private int mPaddingRight;
-
-    private int mPaddingTop;
-
-    private int mPaddingBottom;
-
-    private long startTime;
-
-    private Point touchPoint;
-
-    private RectF buttonRectF;
-
-    private Path clipPath;
-
     private int state = StateNormal;
-
+    private static final int StateTouchDown = 2;
+    private static final int StateTouchUp = 3;
+    private String mText;
+    private Bitmap mBitmap;
+    private int mTextColor;
+    private int mTextSize;
+    private int mRadius;
+    private int mColorNormal;
+    private int mColorShadow;
+    private int mColorRipple;
+    private int mPaddingLeft;
+    private int mPaddingRight;
+    private int mPaddingTop;
+    private int mPaddingBottom;
+    private long startTime;
+    private Point touchPoint;
+    private RectF buttonRectF;
+    private Path clipPath;
     private int rippleRadius;
 
     private Paint mButtonPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private Paint mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    private Paint mIconPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private TextPaint mTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 
@@ -121,6 +108,10 @@ public class MaterialButton extends View {
                         getDimension(R.dimen.text_size));
                 mTextColor = attr.getColor(R.styleable.MaterialButton_text_color,
                         getColor(R.color.text_color));
+                Drawable drawable = attr.getDrawable(R.styleable.MaterialButton_icon);
+                if (drawable != null) {
+                    mBitmap = ((BitmapDrawable) drawable).getBitmap();
+                }
                 mColorNormal = attr.getColor(R.styleable.MaterialButton_color_normal,
                         getColor(R.color.color_normal));
                 mColorShadow = attr.getColor(R.styleable.MaterialButton_color_shadow,
@@ -145,6 +136,10 @@ public class MaterialButton extends View {
 
     private int getDimension(int id) {
         return getResources().getDimensionPixelSize(id);
+    }
+
+    private Drawable getDrawable(int id) {
+        return getResources().getDrawable(id);
     }
 
     private TypedArray getTypedArray(Context context, AttributeSet attributeSet, int[] attr) {
@@ -227,7 +222,13 @@ public class MaterialButton extends View {
         canvas.drawCircle(touchPoint.x, touchPoint.y, radius, mCirclePaint);
         // Draw button text
         canvas.restore();
-        drawText(canvas);
+        if (mBitmap != null) {
+            float x = (getWidth() - mBitmap.getWidth()) / 2;
+            float y = (getHeight() - mBitmap.getHeight()) / 2 - mPaddingBottom + mPaddingTop;
+            canvas.drawBitmap(mBitmap, x, y, mIconPaint);
+        } else {
+            drawText(canvas);
+        }
     }
 
     public void drawText(Canvas canvas) {

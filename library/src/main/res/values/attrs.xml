@@ -4,6 +4,7 @@
         <attr name="text" format="string"/>
         <attr name="text_color" format="color"/>
         <attr name="text_size" format="dimension"/>
+        <attr name="icon" format="reference"/>
         <attr name="corner_radius" format="dimension" />
         <attr name="color_normal" format="color" />
         <attr name="color_shadow" format="color" />
