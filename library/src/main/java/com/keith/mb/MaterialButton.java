@@ -148,6 +148,7 @@ public class MaterialButton extends View {
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
+        super.onTouchEvent(event);
         touchPoint.set(Math.round(event.getX()), Math.round(event.getY()));
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -164,6 +165,14 @@ public class MaterialButton extends View {
                 break;
         }
         return true;
+    }
+
+    public void setIcon(int icon_id) {
+        Drawable drawable = getDrawable(icon_id);
+        if (drawable != null) {
+            mBitmap = ((BitmapDrawable) drawable).getBitmap();
+        }
+        invalidate();
     }
 
     @Override
